@@ -1,0 +1,66 @@
+<div class="task-list-container">
+  <!-- Header -->
+  <header>
+    <h2>My Tasks</h2>
+  </header>
+
+  <!-- Add Task form -->
+  <div class="add-task-form">
+    <input type="text" [value]="newTaskText()" (input)="updateTaskText($event)" (keyup.enter)="addTask()"
+      placeholder="Enter what needs to be done..." class="task-input" data-testid="task-input">
+
+    <button (click)="addTask()" class="add-task-button" data-testid="add-task-button">Add Task</button>
+  </div>
+
+  <!-- Filters -->
+  <div class="task-filters">
+    <button (click)="setFilter('all')" [class.active]="filter() === 'all'" data-testid="filter-all">
+      All - ({{ tasks().length }})
+    </button>
+    <button (click)="setFilter('active')" [class.active]="filter() === 'active'" data-testid="filter-active">
+      Active - ({{ activeTasksCount() }})
+    </button>
+    <button (click)="setFilter('completed')" [class.active]="filter() === 'completed'" data-testid="filter-completed">
+      Completed - ({{ completedTasksCount() }})
+    </button>
+  </div>
+
+  <!-- Task List -->
+  <ul class="task-list">
+    @for (task of filteredTasks(); track task.id) {
+    <li [class.completed]="task.completed" [attr.data-testid]="'task-item-' + task.id">
+      <input type="checkbox" [checked]="task.completed" (change)="toggleTask(task.id)"
+        [attr.data-testid]="'task-checkbox-' + task.id">
+      <span class="task-text">{{ task.text }}</span>
+      <button type="button" (click)="deleteTask(task.id)" class="delete-task-button"
+        [attr.data-testid]="'delete-button-' + task.id">
+        ✕
+      </button>
+    </li>
+    } @empty {
+    <li class="empty-state" data-testid="empty-state">
+      @if (filter() === 'all') {
+      <span>No tasks yet. Add one to get started...</span>
+      } @else if (filter() === 'active') {
+      <span>No active tasks...</span>
+      } @else {
+      <span>No completed tasks yet...</span>
+      }
+    </li>
+    }
+  </ul>
+
+  <!-- Footer Stats -->
+  @if (tasks().length > 0) {
+  <footer class="task-footer" data-testid="task-footer">
+    <span class="task-count">
+      {{ activeTasksCount() }} {{ activeTasksCount() === 1 ? 'task' : 'tasks' }} left
+    </span>
+    @if (completedTasksCount() > 0) {
+    <button (click)="clearCompleted()" class="clear-completed" data-testid="clear-completed">
+      Clear completed
+    </button>
+    }
+  </footer>
+  }
+</div>
